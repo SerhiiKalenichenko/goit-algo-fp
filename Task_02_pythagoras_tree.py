@@ -1,58 +1,52 @@
 import argparse
-import math
-
+import cmath
 import matplotlib.pyplot as plt
 
 
-def draw_square(ax, x, y, size, angle):
-    points = []
-    for dx, dy in ((0, 0), (size, 0), (size, size), (0, size)):
-        rx = x + dx * math.cos(angle) - dy * math.sin(angle)
-        ry = y + dx * math.sin(angle) + dy * math.cos(angle)
-        points.append((rx, ry))
+def draw_square(ax, z, dz):
+    p0 = z
+    p1 = z + dz
+    p2 = z + dz + dz * 1j
+    p3 = z + dz * 1j
 
-    polygon = plt.Polygon(points, closed=True,
-                          edgecolor="black", facecolor="green", linewidth=0.5)
-    ax.add_patch(polygon)
-    return points
+    xs = [p.real for p in (p0, p1, p2, p3, p0)]
+    ys = [p.imag for p in (p0, p1, p2, p3, p0)]
+
+    ax.fill(xs, ys, edgecolor="black", facecolor="green", linewidth=0.4)
 
 
-def pythagoras_tree(ax, x, y, size, angle, level):
-    if level == 0:
+def pythagoras_tree(ax, n, z, dz):
+    if n == 0:
         return
 
-    points = draw_square(ax, x, y, size, angle)
-    p3 = points[3]
-    p2 = points[2]
+    draw_square(ax, z, dz)
 
-    vx = p2[0] - p3[0]
-    vy = p2[1] - p3[1]
+    z_top_left = z + dz * 1j
+    dz_left = dz * (1 + 1j) / 2
+    dz_right = dz * (1 - 1j) / 2
 
-    new_size = math.hypot(vx, vy) * math.cos(math.radians(45))
-    angle_left = angle + math.radians(45)
-    angle_right = angle - math.radians(45)
+    pythagoras_tree(ax, n - 1, z_top_left, dz_left)
 
-    pythagoras_tree(ax, p3[0], p3[1], new_size, angle_left, level - 1)
-    pythagoras_tree(ax, p2[0], p2[1], new_size, angle_right, level - 1)
+    z_top_right = z_top_left + dz_left
+    pythagoras_tree(ax, n - 1, z_top_right, dz_right)
 
 
-def main(recursion_level: int):
+def main(level: int):
     fig, ax = plt.subplots()
-    pythagoras_tree(ax, x=0.0, y=0.0, size=1.0, angle=0.0, level=recursion_level)
+
+    z0 = -0.5 + 0j
+    dz0 = 1 + 0j
+
+    pythagoras_tree(ax, level, z0, dz0)
+
     ax.set_aspect("equal")
     ax.axis("off")
+    plt.tight_layout()
     plt.show()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Візуалізація фрактала «дерево Піфагора»."
-    )
-    parser.add_argument(
-        "--level",
-        type=int,
-        default=6,
-        help="Рівень рекурсії (рекомендовано 5–9).",
-    )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--level", type=int, default=8)
     args = parser.parse_args()
     main(args.level)
