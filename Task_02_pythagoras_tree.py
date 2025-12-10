@@ -1,5 +1,4 @@
 import argparse
-import cmath
 import matplotlib.pyplot as plt
 
 
@@ -16,7 +15,7 @@ def draw_square(ax, z, dz):
 
 
 def pythagoras_tree(ax, n, z, dz):
-    if n == 0:
+    if n <= 0:
         return
 
     draw_square(ax, z, dz)
@@ -45,12 +44,12 @@ def main(level: int):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--level", type=int, help="Рівень рекурсії (5–10 рекомендовано)")
+    parser.add_argument("--level", type=int, help="Рівень рекурсії")
     args = parser.parse_args()
 
     if args.level is None:
         try:
-            level = int(input("Вкажіть рівень рекурсії (наприклад 7): "))
+            level = int(input("Вкажіть рівень рекурсії: "))
         except ValueError:
             level = 7
     else:
