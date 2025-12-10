@@ -26,9 +26,7 @@ def pythagoras_tree(ax, n, z, dz):
     dz_right = dz * (1 - 1j) / 2
 
     pythagoras_tree(ax, n - 1, z_top_left, dz_left)
-
-    z_top_right = z_top_left + dz_left
-    pythagoras_tree(ax, n - 1, z_top_right, dz_right)
+    pythagoras_tree(ax, n - 1, z_top_left + dz_left, dz_right)
 
 
 def main(level: int):
@@ -47,6 +45,15 @@ def main(level: int):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--level", type=int, default=8)
+    parser.add_argument("--level", type=int, help="Рівень рекурсії (5–10 рекомендовано)")
     args = parser.parse_args()
-    main(args.level)
+
+    if args.level is None:
+        try:
+            level = int(input("Вкажіть рівень рекурсії (наприклад 7): "))
+        except ValueError:
+            level = 7
+    else:
+        level = args.level
+
+    main(level)
